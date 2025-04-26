@@ -8,32 +8,11 @@ import (
 )
 
 type Config struct {
-	DB_Url            string `json:db_url`
-	Current_user_name string `json:current_user_name`
+	DBUrl           string `json:db_url`
+	CurrentUserName string `json:current_user_name`
 }
 
 const configFileName = ".gatorconfig.json"
-
-func Read() (Config, error) {
-	fullPath, err := getConfigFilePath()
-	var config Config
-
-	if err != nil {
-		return config, fmt.Errorf("Error retriving home directory - %v", err)
-	}
-
-	data, err := os.ReadFile(fullPath)
-	if err != nil {
-		return config, fmt.Errorf("Unable to read the config file - %v", err)
-	}
-
-	err = json.Unmarshal(data, &config)
-	if err != nil {
-		return config, fmt.Errorf("Incorrect config format -  %v", err)
-	}
-
-	return config, nil
-}
 
 func getConfigFilePath() (string, error) {
 	home, err := os.UserHomeDir()
@@ -44,6 +23,7 @@ func getConfigFilePath() (string, error) {
 	return fullPath, nil
 }
 
+// This is a internal function so not exported
 func write(config Config) error {
 	fullPath, err := getConfigFilePath()
 	if err != nil {
@@ -64,7 +44,28 @@ func write(config Config) error {
 	return nil
 }
 
+func Read() (Config, error) {
+	fullPath, err := getConfigFilePath()
+	var config Config
+
+	if err != nil {
+		return config, fmt.Errorf("Error retriving home directory - %v", err)
+	}
+
+	data, err := os.ReadFile(fullPath)
+	if err != nil {
+		return config, fmt.Errorf("Unable to read the config file %s - %v", fullPath, err)
+	}
+
+	err = json.Unmarshal(data, &config)
+	if err != nil {
+		return config, fmt.Errorf("Incorrect config format -  %v", err)
+	}
+
+	return config, nil
+}
+
 func (c *Config) SetUser(userName string) error {
-	c.Current_user_name = userName
+	c.CurrentUserName = userName
 	return write(*c)
 }
