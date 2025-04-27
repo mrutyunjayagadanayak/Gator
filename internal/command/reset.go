@@ -10,7 +10,7 @@ func HandlerReset(s *state.State, cmd Command) error {
 	err := s.DB.DeleteData(context.Background())
 
 	if err != nil {
-		return fmt.Errorf("Error resetting database - %v", err)
+		return fmt.Errorf("error resetting database - %v", err)
 	}
 	fmt.Println("Database reset successfully")
 	return nil
