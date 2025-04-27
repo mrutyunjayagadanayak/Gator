@@ -9,7 +9,7 @@ import (
 func HandlerUsers(s *state.State, cmd Command) error {
 	users, err := s.DB.GetUsers(context.Background())
 	if err != nil {
-		fmt.Println("Error getting users - ", err)
+		return fmt.Errorf("error getting users - %v", err)
 	}
 	for _, user := range users {
 		if s.Config.CurrentUserName == user.Name {
