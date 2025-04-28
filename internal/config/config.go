@@ -17,7 +17,7 @@ const configFileName = ".gatorconfig.json"
 func getConfigFilePath() (string, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return "", fmt.Errorf("Unable to get Home directory - %v", err)
+		return "", fmt.Errorf("unable to get home directory - %v", err)
 	}
 	fullPath := filepath.Join(home, configFileName)
 	return fullPath, nil
@@ -32,14 +32,14 @@ func write(config Config) error {
 
 	file, err := os.Create(fullPath)
 	if err != nil {
-		return fmt.Errorf("Unable to open the file - %v", err)
+		return fmt.Errorf("unable to open the file - %v", err)
 	}
 	defer file.Close()
 
 	encoder := json.NewEncoder(file)
 	err = encoder.Encode(config)
 	if err != nil {
-		return fmt.Errorf("Error writing file - %v", err)
+		return fmt.Errorf("error writing file - %v", err)
 	}
 	return nil
 }
@@ -49,17 +49,17 @@ func Read() (Config, error) {
 	var config Config
 
 	if err != nil {
-		return config, fmt.Errorf("Error retriving home directory - %v", err)
+		return config, fmt.Errorf("error retrieving home directory - %v", err)
 	}
 
 	data, err := os.ReadFile(fullPath)
 	if err != nil {
-		return config, fmt.Errorf("Unable to read the config file %s - %v", fullPath, err)
+		return config, fmt.Errorf("unable to read the config file %s - %v", fullPath, err)
 	}
 
 	err = json.Unmarshal(data, &config)
 	if err != nil {
-		return config, fmt.Errorf("Incorrect config format -  %v", err)
+		return config, fmt.Errorf("incorrect config format -  %v", err)
 	}
 
 	return config, nil
