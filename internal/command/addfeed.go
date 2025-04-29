@@ -17,6 +17,11 @@ func HandlerAddFeed(s *state.State, cmd Command) error {
 	}
 	feedName := cmd.Args[0]
 	feedURL := cmd.Args[1]
+
+	if s.Config.CurrentUserName == "" {
+		return fmt.Errorf("no user logged in")
+	}
+
 	currentUser, err := s.DB.GetUser(context.Background(), s.Config.CurrentUserName)
 	if err != nil {
 		return err
