@@ -12,7 +12,7 @@ import (
 )
 
 func HandlerAddFeed(s *state.State, cmd Command) error {
-	if len(cmd.Args) < 1 {
+	if len(cmd.Args) < 2 {
 		return fmt.Errorf("not enough arguments provided")
 	}
 	feedName := cmd.Args[0]
