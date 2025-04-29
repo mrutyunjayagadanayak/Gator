@@ -26,5 +26,6 @@ CREATE TABLE feed_follows (
     CONSTRAINT follow UNIQUE (user_id, feed_id) 
 );
 -- +goose Down
+DROP TABLE feed_follows;
 DROP TABLE feeds;
 DROP TABLE users;
