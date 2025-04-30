@@ -11,6 +11,15 @@ import (
 	"github.com/google/uuid"
 )
 
+func printFeed(feed database.Feed, user database.User) {
+	fmt.Printf("* ID:            %s\n", feed.ID)
+	fmt.Printf("* Created:       %v\n", feed.CreatedAt)
+	fmt.Printf("* Updated:       %v\n", feed.UpdatedAt)
+	fmt.Printf("* Name:          %s\n", feed.Name)
+	fmt.Printf("* URL:           %s\n", feed.Url)
+	fmt.Printf("* User:          %s\n", user.Name)
+}
+
 func HandlerAddFeed(s *state.State, cmd Command) error {
 	if len(cmd.Args) < 2 {
 		return fmt.Errorf("not enough arguments provided")
@@ -41,7 +50,24 @@ func HandlerAddFeed(s *state.State, cmd Command) error {
 	if err != nil {
 		return fmt.Errorf("failed to create feed: %v", err)
 	}
+
+	feedFollow, err := s.DB.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    currentUser.ID,
+		FeedID:    rFeed.ID,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create feed follow: %v", err)
+	}
+
 	fmt.Printf("Feed added: %v\n", rFeed)
+	printFeed(rFeed, currentUser)
+	fmt.Println()
+	fmt.Println("Feed followed successfully:")
+	printFeedFollow(feedFollow.UserName, feedFollow.FeedName)
+	fmt.Println("=====================================")
 	return nil
 
 }
