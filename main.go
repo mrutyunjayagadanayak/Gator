@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Gator/internal"
 	"Gator/internal/command"
 	"Gator/internal/config"
 	"Gator/internal/database"
@@ -39,10 +40,10 @@ func main() {
 	commands.Register("reset", command.HandlerReset)
 	commands.Register("users", command.HandlerUsers)
 	commands.Register("agg", command.HandlerAgg)
-	commands.Register("addfeed", command.HandlerAddFeed)
+	commands.Register("addfeed", internal.MiddlewareLoggedIN(command.HandlerAddFeed))
 	commands.Register("feeds", command.HandlerGetAllFeeds)
-	commands.Register("follow", command.HandlerFollow)
-	commands.Register("following", command.HandlerListFeedFollows)
+	commands.Register("follow", internal.MiddlewareLoggedIN(command.HandlerFollow))
+	commands.Register("following", internal.MiddlewareLoggedIN(command.HandlerListFeedFollows))
 
 	cmd := command.Command{
 		Name: os.Args[1],

@@ -20,22 +20,18 @@ func printFeed(feed database.Feed, user database.User) {
 	fmt.Printf("* User:          %s\n", user.Name)
 }
 
-func HandlerAddFeed(s *state.State, cmd Command) error {
+func HandlerAddFeed(s *state.State, cmd Command, user database.User) error {
 	if len(cmd.Args) < 2 {
 		return fmt.Errorf("not enough arguments provided")
 	}
 	feedName := cmd.Args[0]
 	feedURL := cmd.Args[1]
 
-	if s.Config.CurrentUserName == "" {
-		return fmt.Errorf("no user logged in")
-	}
-
-	currentUser, err := s.DB.GetUser(context.Background(), s.Config.CurrentUserName)
-	if err != nil {
-		return err
-	}
-	_, err = feed.FetchFeed(context.Background(), feedURL)
+	//currentUser, err := s.DB.GetUser(context.Background(), s.Config.CurrentUserName)
+	//if err != nil {
+	//	return err
+	//}
+	_, err := feed.FetchFeed(context.Background(), feedURL)
 	if err != nil {
 		return fmt.Errorf("failed to fetch feed: %v", err)
 	}
@@ -43,7 +39,7 @@ func HandlerAddFeed(s *state.State, cmd Command) error {
 		ID:        uuid.New(),
 		Name:      feedName,
 		Url:       feedURL,
-		UserID:    currentUser.ID,
+		UserID:    user.ID,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	})
@@ -55,7 +51,7 @@ func HandlerAddFeed(s *state.State, cmd Command) error {
 		ID:        uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		UserID:    currentUser.ID,
+		UserID:    user.ID,
 		FeedID:    rFeed.ID,
 	})
 	if err != nil {
@@ -63,7 +59,7 @@ func HandlerAddFeed(s *state.State, cmd Command) error {
 	}
 
 	fmt.Printf("Feed added: %v\n", rFeed)
-	printFeed(rFeed, currentUser)
+	printFeed(rFeed, user)
 	fmt.Println()
 	fmt.Println("Feed followed successfully:")
 	printFeedFollow(feedFollow.UserName, feedFollow.FeedName)
