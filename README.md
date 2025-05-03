@@ -1,5 +1,5 @@
 Gator
-Gator is a backend service developed in Go, utilizing SQLC for type-safe database interactions. It is designed to provide a robust and efficient foundation for applications requiring structured database access.
+gator is a backend service developed in Go, utilizing SQLC for type-safe database interactions. It is designed to provide a robust and efficient foundation for applications requiring structured database access.
 
 Features
 Go Backend: Leverages Go's concurrency and performance features.
