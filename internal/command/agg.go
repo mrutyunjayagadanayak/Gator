@@ -7,7 +7,10 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 func HandlerAgg(s *state.State, cmd Command) error {
@@ -46,6 +49,7 @@ func scrapeFeeds(s *state.State) error {
 		LastFetchedAt: sql.NullTime{Time: time.Now(), Valid: true},
 	})
 	if err != nil {
+		fmt.Println("Error updating feed fetch time:", err)
 		return err
 	}
 	feedData, err := feed.FetchFeed(context.Background(), feeed.Url)
@@ -53,7 +57,40 @@ func scrapeFeeds(s *state.State) error {
 		return fmt.Errorf("failed to fetch feed: %v", err)
 	}
 	for _, item := range feedData.Channel.Item {
-		fmt.Println(item.Title)
+		var parsedTime sql.NullTime
+		if item.PubDate == "" {
+			parsedTime = sql.NullTime{Time: time.Now(), Valid: false}
+		} else {
+			tempHolderTime, err := time.Parse(time.RFC1123Z, item.PubDate)
+			if err == nil {
+				parsedTime = sql.NullTime{Time: tempHolderTime, Valid: true}
+			} else {
+				tempHolderTime, err = time.Parse(time.RFC822, item.PubDate)
+				if err == nil {
+					parsedTime = sql.NullTime{Time: tempHolderTime, Valid: true}
+				}
+			}
+		}
+
+		post, err := s.DB.CreatePost(context.Background(), database.CreatePostParams{
+			ID:          uuid.New(),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+			FeedID:      feeed.ID,
+			Title:       sql.NullString{String: item.Title, Valid: true},
+			Url:         item.Link,
+			Description: sql.NullString{String: item.Description, Valid: true},
+			PublishedAt: parsedTime,
+		})
+		if err != nil {
+			if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+				continue
+			} else {
+				fmt.Printf("failed to create post: %v\n", err)
+				continue
+			}
+		}
+		printPost(post)
 	}
 	return nil
 }

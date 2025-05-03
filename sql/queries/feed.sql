@@ -27,7 +27,7 @@ SET last_fetched_at = $1
 WHERE id = $2;
 
 -- name: GetNextFeedToFetch :one 
-SELECT *
-FROM feeds
+SELECT * FROM feeds
+WHERE last_fetched_at IS NULL OR last_fetched_at < NOW() - INTERVAL '10 seconds'
 ORDER BY last_fetched_at NULLS FIRST
 LIMIT 1;
